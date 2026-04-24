@@ -7,8 +7,4 @@ class VRDBCELoss(nn.Module):
         self.loss = nn.BCEWithLogitsLoss()
 
     def forward(self, net_output, target):
-        y_true = target['target_oh']
-        cost = self.loss(net_output['rel_scores'], y_true)
-        out = {}
-        out['loss'] = cost
-        return out
+        pass

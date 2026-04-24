@@ -4,27 +4,10 @@ import torch.nn.functional as F
 from .. import mlp
 
 def get_sizes_list(dim, chunks):
-    split_size = (dim + chunks - 1) // chunks
-    sizes_list = [split_size] * chunks
-    sizes_list[-1] = sizes_list[-1] - (sum(sizes_list) - dim) # Adjust last
-    assert sum(sizes_list) == dim
-    if sizes_list[-1]<0:
-        n_miss = sizes_list[-2] - sizes_list[-1]
-        sizes_list[-1] = sizes_list[-2]
-        for j in range(n_miss):
-            sizes_list[-j-1] -= 1
-        assert sum(sizes_list) == dim
-        assert min(sizes_list) > 0
-    return sizes_list
+    pass
 
 def get_chunks(x,sizes):
-    out = []
-    begin = 0
-    for s in sizes:
-        y = x.narrow(1,begin,s)
-        out.append(y)
-        begin += s
-    return out
+    pass
 
 
 class Block(nn.Module):
@@ -74,38 +57,7 @@ class Block(nn.Module):
         self.n_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
-        x0 = self.linear0(x[0])
-        x1 = self.linear1(x[1])
-        bsize = x1.size(0)
-        if self.dropout_input > 0:
-            x0 = F.dropout(x0, p=self.dropout_input, training=self.training)
-            x1 = F.dropout(x1, p=self.dropout_input, training=self.training)
-        x0_chunks = get_chunks(x0, self.sizes_list)
-        x1_chunks = get_chunks(x1, self.sizes_list)
-        zs = []
-        for chunk_id, m0, m1 in zip(range(len(self.sizes_list)),
-                                    self.merge_linears0,
-                                    self.merge_linears1):
-            x0_c = x0_chunks[chunk_id]
-            x1_c = x1_chunks[chunk_id]
-            m = m0(x0_c) * m1(x1_c) # bsize x split_size*rank
-            m = m.view(bsize, self.rank, -1)
-            z = torch.sum(m, 1)
-            if self.pos_norm == 'before_cat':
-                z = torch.sqrt(F.relu(z)) - torch.sqrt(F.relu(-z))
-                z = F.normalize(z,p=2)
-            zs.append(z)
-        z = torch.cat(zs,1)
-        if self.pos_norm == 'after_cat':
-            z = torch.sqrt(F.relu(z)) - torch.sqrt(F.relu(-z))
-            z = F.normalize(z,p=2)
-
-        if self.dropout_pre_lin > 0:
-            z = F.dropout(z, p=self.dropout_pre_lin, training=self.training)
-        z = self.linear_out(z)
-        if self.dropout_output > 0:
-            z = F.dropout(z, p=self.dropout_output, training=self.training)
-        return z
+        pass
 
 
 class BlockTucker(nn.Module):
@@ -149,34 +101,7 @@ class BlockTucker(nn.Module):
         self.n_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
-        x0 = self.linear0(x[0])
-        x1 = self.linear1(x[1])
-        bsize = x1.size(0)
-        if self.dropout_input:
-            x0 = F.dropout(x0, p=self.dropout_input, training=self.training)
-            x1 = F.dropout(x1, p=self.dropout_input, training=self.training)
-        x0_chunks = get_chunks(x0, self.sizes_list)
-        x1_chunks = get_chunks(x1, self.sizes_list)
-        zs = []
-        for chunk_id, bilinear in enumerate(self.bilinears):
-            x0_c = x0_chunks[chunk_id]
-            x1_c = x1_chunks[chunk_id]
-            z = bilinear(x0_c, x1_c)
-            if self.pos_norm == 'before_cat':
-                z = torch.sqrt(F.relu(z)) - torch.sqrt(F.relu(-z))
-                z = F.normalize(z,p=2)
-            zs.append(z)
-        z = torch.cat(zs, 1)
-        if self.pos_norm == 'after_cat':
-            z = torch.sqrt(F.relu(z)) - torch.sqrt(F.relu(-z))
-            z = F.normalize(z,p=2)
-
-        if self.dropout_pre_lin > 0:
-            z = F.dropout(z, p=self.dropout_pre_lin, training=self.training)
-        z = self.linear_out(z)
-        if self.dropout_output > 0:
-            z = F.dropout(z, p=self.dropout_output, training=self.training)
-        return z
+        pass
 
 
 class Mutan(nn.Module):
@@ -214,30 +139,7 @@ class Mutan(nn.Module):
         self.n_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
-        x0 = self.linear0(x[0])
-        x1 = self.linear1(x[1])
-
-        if self.dropout_input > 0:
-            x0 = F.dropout(x0, p=self.dropout_input, training=self.training)
-            x1 = F.dropout(x1, p=self.dropout_input, training=self.training)
-
-        m0 = self.merge_linear0(x0)
-        m1 = self.merge_linear1(x1)
-        m = m0 * m1
-        m = m.view(-1, self.rank, self.mm_dim)
-        z = torch.sum(m, 1)
-        if self.normalize:
-            z = torch.sqrt(F.relu(z)) - torch.sqrt(F.relu(-z))
-            z = F.normalize(z, p=2)
-
-        if self.dropout_pre_lin > 0:
-            z = F.dropout(z, p=self.dropout_pre_lin, training=self.training)
-
-        z = self.linear_out(z)
-
-        if self.dropout_output > 0:
-            z = F.dropout(z, p=self.dropout_output, training=self.training)
-        return z
+        pass
 
 
 class Tucker(nn.Module):
@@ -272,27 +174,7 @@ class Tucker(nn.Module):
         self.n_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
-        x0 = self.linear0(x[0])
-        x1 = self.linear1(x[1])
-
-        if self.dropout_input > 0:
-            x0 = F.dropout(x0, p=self.dropout_input, training=self.training)
-            x1 = F.dropout(x1, p=self.dropout_input, training=self.training)
-
-        z = self.bilinear(x0, x1)
-
-        if self.normalize:
-            z = torch.sqrt(F.relu(z)) - torch.sqrt(F.relu(-z))
-            z = F.normalize(z,p=2)
-
-        if self.dropout_pre_lin > 0:
-            z = F.dropout(z, p=self.dropout_pre_lin, training=self.training)
-
-        z = self.linear_out(z)
-
-        if self.dropout_output > 0:
-            z = F.dropout(z, p=self.dropout_output, training=self.training)
-        return z
+        pass
 
 
 class MLB(nn.Module):
@@ -324,34 +206,7 @@ class MLB(nn.Module):
         self.n_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
-        x0 = self.linear0(x[0])
-        x1 = self.linear1(x[1])
-
-        if self.activ_input:
-            x0 = getattr(F, self.activ_input)(x0)
-            x1 = getattr(F, self.activ_input)(x1)
-
-        if self.dropout_input > 0:
-            x0 = F.dropout(x0, p=self.dropout_input, training=self.training)
-            x1 = F.dropout(x1, p=self.dropout_input, training=self.training)
-
-        z = x0 * x1
-
-        if self.normalize:
-            z = torch.sqrt(F.relu(z)) - torch.sqrt(F.relu(-z))
-            z = F.normalize(z,p=2)
-
-        if self.dropout_pre_lin > 0:
-            z = F.dropout(z, p=self.dropout_pre_lin, training=self.training)
-
-        z = self.linear_out(z)
-
-        if self.activ_output:
-            z = getattr(F, self.activ_output)(z)
-
-        if self.dropout_output > 0:
-            z = F.dropout(z, p=self.dropout_output, training=self.training)
-        return z
+        pass
 
 
 class MFB(nn.Module):
@@ -385,37 +240,7 @@ class MFB(nn.Module):
         self.n_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
-        x0 = self.linear0(x[0])
-        x1 = self.linear1(x[1])
-
-        if self.activ_input:
-            x0 = getattr(F, self.activ_input)(x0)
-            x1 = getattr(F, self.activ_input)(x1)
-
-        if self.dropout_input > 0:
-            x0 = F.dropout(x0, p=self.dropout_input, training=self.training)
-            x1 = F.dropout(x1, p=self.dropout_input, training=self.training)
-
-        z = x0 * x1
-
-        if self.dropout_pre_norm > 0:
-            z = F.dropout(z, p=self.dropout_pre_norm, training=self.training)
-
-        z = z.view(z.size(0), self.mm_dim, self.factor)
-        z = z.sum(2)
-
-        if self.normalize:
-            z = torch.sqrt(F.relu(z)) - torch.sqrt(F.relu(-z))
-            z = F.normalize(z,p=2)
-
-        z = self.linear_out(z)
-
-        if self.activ_output:
-            z = getattr(F, self.activ_output)(z)
-
-        if self.dropout_output > 0:
-            z = F.dropout(z, p=self.dropout_output, training=self.training)
-        return z
+        pass
 
 
 class MFH(nn.Module):
@@ -451,64 +276,7 @@ class MFH(nn.Module):
         self.n_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
-        x0 = self.linear0_0(x[0])
-        x1 = self.linear1_0(x[1])
-
-        if self.activ_input:
-            x0 = getattr(F, self.activ_input)(x0)
-            x1 = getattr(F, self.activ_input)(x1)
-
-        if self.dropout_input > 0:
-            x0 = F.dropout(x0, p=self.dropout_input, training=self.training)
-            x1 = F.dropout(x1, p=self.dropout_input, training=self.training)
-
-        z_0_skip = x0 * x1
-
-        if self.dropout_pre_lin:
-            z_0_skip = F.dropout(z_0_skip, p=self.dropout_pre_lin, training=self.training)
-
-        z_0 = z_0_skip.view(z_0_skip.size(0), self.mm_dim, self.factor)
-        z_0 = z_0.sum(2)
-
-        if self.normalize:
-            z_0 = torch.sqrt(F.relu(z_0)) - torch.sqrt(F.relu(-z_0))
-            z_0 = F.normalize(z_0, p=2)
-
-        #
-        x0 = self.linear0_1(x[0])
-        x1 = self.linear1_1(x[1])
-
-        if self.activ_input:
-            x0 = getattr(F, self.activ_input)(x0)
-            x1 = getattr(F, self.activ_input)(x1)
-
-        if self.dropout_input > 0:
-            x0 = F.dropout(x0, p=self.dropout_input, training=self.training)
-            x1 = F.dropout(x1, p=self.dropout_input, training=self.training)
-
-        z_1 = x0 * x1 * z_0_skip
-
-        if self.dropout_pre_lin > 0:
-            z_1 = F.dropout(z_1, p=self.dropout_pre_lin, training=self.training)
-
-        z_1 = z_1.view(z_1.size(0), self.mm_dim, self.factor)
-        z_1 = z_1.sum(2)
-
-        if self.normalize:
-            z_1 = torch.sqrt(F.relu(z_1)) - torch.sqrt(F.relu(-z_1))
-            z_1 = F.normalize(z_1, p=2)
-
-        #
-        cat_dim = z_0.dim() - 1
-        z = torch.cat([z_0, z_1], cat_dim)
-        z = self.linear_out(z)
-
-        if self.activ_output:
-            z = getattr(F, self.activ_output)(z)
-
-        if self.dropout_output > 0:
-            z = F.dropout(z, p=self.dropout_output, training=self.training)
-        return z
+        pass
 
 
 class MCB(nn.Module):
@@ -533,13 +301,7 @@ class MCB(nn.Module):
         self.n_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
-        z = self.mcb(x[0], x[1])
-        z = self.linear_out(z)
-        if self.activ_output:
-            z = getattr(F, self.activ_output)(z)
-        if self.dropout_output > 0:
-            z = F.dropout(z, p=self.dropout_output, training=self.training)
-        return z
+        pass
 
 
 class LinearSum(nn.Module):
@@ -571,34 +333,7 @@ class LinearSum(nn.Module):
         self.n_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
-        x0 = self.linear0(x[0])
-        x1 = self.linear1(x[1])
-
-        if self.activ_input:
-            x0 = getattr(F, self.activ_input)(x0)
-            x1 = getattr(F, self.activ_input)(x1)
-
-        if self.dropout_input > 0:
-            x0 = F.dropout(x0, p=self.dropout_input, training=self.training)
-            x1 = F.dropout(x1, p=self.dropout_input, training=self.training)
-
-        z = x0 + x1
-
-        if self.normalize:
-            z = torch.sqrt(F.relu(z)) - torch.sqrt(F.relu(-z))
-            z = F.normalize(z,p=2)
-
-        if self.dropout_pre_lin > 0:
-            z = F.dropout(z, p=self.dropout_pre_lin, training=self.training)
-
-        z = self.linear_out(z)
-
-        if self.activ_output:
-            z = getattr(F, self.activ_output)(z)
-
-        if self.dropout_output > 0:
-            z = F.dropout(z, p=self.dropout_output, training=self.training)
-        return z
+        pass
 
 
 class ConcatMLP(nn.Module):
@@ -625,10 +360,4 @@ class ConcatMLP(nn.Module):
         self.n_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
-        if x[0].dim() == 3 and x[1].dim() == 2:
-            x[1] = x[1].unsqueeze(1).reshape_as(x[0])
-        if x[1].dim() == 3 and x[0].dim() == 2:
-            x[0] = x[0].unsqueeze(1).reshape_as(x[1])
-        z = torch.cat(x, dim=x[0].dim()-1)
-        z = self.mlp(z)
-        return z
+        pass

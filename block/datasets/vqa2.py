@@ -44,13 +44,7 @@ class VQA2(AbstractVQA):
         self.load_original_annotation = False
 
     def add_rcnn_to_item(self, item):
-        path_rcnn = os.path.join(self.dir_rcnn, '{}.pth'.format(item['image_name']))
-        item_rcnn = torch.load(path_rcnn)
-        item['visual'] = item_rcnn['pooled_feat']
-        item['coord'] = item_rcnn['rois']
-        item['norm_coord'] = item_rcnn['norm_rois']
-        item['nb_regions'] = item['visual'].size(0)
-        return item
+        pass
 
     def __getitem__(self, index):
         item = {}
@@ -91,29 +85,4 @@ class VQA2(AbstractVQA):
         return item
 
     def download(self):
-        dir_zip = osp.join(self.dir_raw, 'zip')
-        os.system('mkdir -p '+dir_zip)
-        dir_ann = osp.join(self.dir_raw, 'annotations')
-        os.system('mkdir -p '+dir_ann)
-        os.system('wget http://visualqa.org/data/mscoco/vqa/v2_Questions_Train_mscoco.zip -P '+dir_zip)
-        os.system('wget http://visualqa.org/data/mscoco/vqa/v2_Questions_Val_mscoco.zip -P '+dir_zip)
-        os.system('wget http://visualqa.org/data/mscoco/vqa/v2_Questions_Test_mscoco.zip -P '+dir_zip)
-        os.system('wget http://visualqa.org/data/mscoco/vqa/v2_Annotations_Train_mscoco.zip -P '+dir_zip)
-        os.system('wget http://visualqa.org/data/mscoco/vqa/v2_Annotations_Val_mscoco.zip -P '+dir_zip)
-        os.system('unzip '+osp.join(dir_zip, 'v2_Questions_Train_mscoco.zip')+' -d '+dir_ann)
-        os.system('unzip '+osp.join(dir_zip, 'v2_Questions_Val_mscoco.zip')+' -d '+dir_ann)
-        os.system('unzip '+osp.join(dir_zip, 'v2_Questions_Test_mscoco.zip')+' -d '+dir_ann)
-        os.system('unzip '+osp.join(dir_zip, 'v2_Annotations_Train_mscoco.zip')+' -d '+dir_ann)
-        os.system('unzip '+osp.join(dir_zip, 'v2_Annotations_Val_mscoco.zip')+' -d '+dir_ann)
-        os.system('mv '+osp.join(dir_ann, 'v2_mscoco_train2014_annotations.json')+' '
-                       +osp.join(dir_ann, 'mscoco_train2014_annotations.json'))
-        os.system('mv '+osp.join(dir_ann, 'v2_mscoco_val2014_annotations.json')+' '
-                       +osp.join(dir_ann, 'mscoco_val2014_annotations.json'))
-        os.system('mv '+osp.join(dir_ann, 'v2_OpenEnded_mscoco_train2014_questions.json')+' '
-                       +osp.join(dir_ann, 'OpenEnded_mscoco_train2014_questions.json'))
-        os.system('mv '+osp.join(dir_ann, 'v2_OpenEnded_mscoco_val2014_questions.json')+' '
-                       +osp.join(dir_ann, 'OpenEnded_mscoco_val2014_questions.json'))
-        os.system('mv '+osp.join(dir_ann, 'v2_OpenEnded_mscoco_test2015_questions.json')+' '
-                       +osp.join(dir_ann, 'OpenEnded_mscoco_test2015_questions.json'))
-        os.system('mv '+osp.join(dir_ann, 'v2_OpenEnded_mscoco_test-dev2015_questions.json')+' '
-                       +osp.join(dir_ann, 'OpenEnded_mscoco_test-dev2015_questions.json'))
+        pass

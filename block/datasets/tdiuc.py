@@ -44,18 +44,10 @@ class TDIUC(AbstractVQA):
         self.dir_rcnn = dir_rcnn
 
     def add_answer(self, annotations):
-        for item in annotations:
-            item['answer'] = item['answers'][0]['answer']
-        return annotations
+        pass
 
     def add_rcnn_to_item(self, item):
-        path_rcnn = os.path.join(self.dir_rcnn, '{}.pth'.format(item['image_name']))
-        item_rcnn = torch.load(path_rcnn)
-        item['visual'] = item_rcnn['pooled_feat']
-        item['coord'] = item_rcnn['rois']
-        item['norm_coord'] = item_rcnn['norm_rois']
-        item['nb_regions'] = item['visual'].size(0)
-        return item
+        pass
 
     def __getitem__(self, index):
         item = {}
@@ -96,9 +88,4 @@ class TDIUC(AbstractVQA):
         return item
 
     def download(self):
-        os.system('wget http://kushalkafle.com/data/TDIUC.zip -P '+self.dir_raw)
-        os.system('unzip '+os.path.join(self.dir_raw, 'TDIUC.zip')+' -d '+self.dir_raw)
-        dir_zip = os.path.join(self.dir_raw, 'TDIUC')
-        dir_ann = os.path.join(self.dir_raw, 'annotations')
-        os.system('mv '+os.path.join(self.dir_zip, 'Annotations')+'/* '+dir_ann)
-        os.system('mv '+os.path.join(self.dir_zip, 'Questions')+'/* '+dir_ann)
+        pass

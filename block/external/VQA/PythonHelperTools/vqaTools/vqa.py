@@ -66,7 +66,7 @@ class VQA:
         Print information about the VQA annotation file.
         :return:
         """
-        useless=True
+        pass
         # for key, value in self.datset['info'].items():
         #     print '%s: %s'%(key, value)
 

@@ -21,10 +21,4 @@ class MLP(nn.Module):
             self.linears.append(nn.Linear(din, dout))
     
     def forward(self, x):
-        for i,lin in enumerate(self.linears):
-            x = lin(x)
-            if (i < len(self.linears)-1):
-                x = F.__dict__[self.activation](x)
-                if self.dropout > 0:
-                    x = F.dropout(x, self.dropout, training=self.training)
-        return x
+        pass

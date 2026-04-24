@@ -7,8 +7,4 @@ class VQACrossEntropyLoss(nn.Module):
         self.loss = nn.CrossEntropyLoss()
 
     def forward(self, net_out, batch):
-        out = {}
-        out['loss'] = self.loss(
-            net_out['logits'],
-            batch['class_id'].squeeze(1))
-        return out
+        pass

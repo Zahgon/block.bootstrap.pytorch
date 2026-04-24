@@ -21,23 +21,4 @@ class VRDNet(nn.Module):
         self.predictor = MLP(**self.opt['predictor'])
 
     def forward(self, batch):
-        bsize = batch['subject_boxes'].size(0)
-        x_c = [self.classeme_embedding(batch['subject_cls_id']),
-               self.classeme_embedding(batch['object_cls_id'])]
-        x_s = [batch['subject_boxes'], batch['object_boxes']]
-        x_f = [batch['subject_features'], batch['object_features']]
-
-        x_c = self.fusion_c(x_c)
-        x_s = self.fusion_s(x_s)
-        x_f = self.fusion_f(x_f)
-
-        x = torch.cat([x_c, x_s, x_f], -1)
-
-        if 'aggreg_dropout' in self.opt:
-            x = F.dropout(x, self.opt['aggreg_dropout'], training=self.training)
-        y = self.predictor(x)
-        
-        out = {
-            'rel_scores': y
-        }
-        return out
+        pass
