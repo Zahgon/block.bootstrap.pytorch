@@ -41,76 +41,7 @@ class AbstractVQA(Dataset):
             has_testdevset=True,
             has_answers_occurence=True,
             do_tokenize_answers=False):
-        super(AbstractVQA, self).__init__(
-            dir_data=dir_data,
-            split=split,
-            batch_size=batch_size,
-            nb_threads=nb_threads,
-            pin_memory=pin_memory,
-            shuffle=shuffle)
-        self.nans = nans
-        self.minwcount = minwcount
-        self.nlp = nlp
-        self.proc_split = proc_split
-        self.samplingans = samplingans
-        # preprocessing
-        self.has_valset = has_valset
-        self.has_testset = has_testset
-        self.has_testset_anno = has_testset_anno
-        self.has_testdevset = has_testdevset
-        self.has_answers_occurence = has_answers_occurence
-        self.do_tokenize_answers = do_tokenize_answers
-
-        # sanity checks
-        if self.split in ['test', 'val'] and self.samplingans:
-            raise ValueError()
-
-        self.dir_raw = os.path.join(self.dir_data, 'raw')
-        if not os.path.exists(self.dir_raw):
-            self.download()
-
-        self.dir_processed = os.path.join(self.dir_data, 'processed')
-        self.subdir_processed = self.get_subdir_processed()
-        self.path_wid_to_word = osp.join(self.subdir_processed, 'wid_to_word.pth')
-        self.path_word_to_wid = osp.join(self.subdir_processed, 'word_to_wid.pth')
-        self.path_aid_to_ans = osp.join(self.subdir_processed, 'aid_to_ans.pth')
-        self.path_ans_to_aid = osp.join(self.subdir_processed, 'ans_to_aid.pth')
-        self.path_trainset = osp.join(self.subdir_processed, 'trainset.pth')
-        self.path_valset = osp.join(self.subdir_processed, 'valset.pth')
-        self.path_is_qid_testdev = osp.join(self.subdir_processed, 'is_qid_testdev.pth')
-        self.path_testset = osp.join(self.subdir_processed, 'testset.pth')
-        
-        if not os.path.exists(self.subdir_processed):
-            self.process()
-
-        self.wid_to_word = torch.load(self.path_wid_to_word)
-        self.word_to_wid = torch.load(self.path_word_to_wid)
-        self.aid_to_ans = torch.load(self.path_aid_to_ans)
-        self.ans_to_aid = torch.load(self.path_ans_to_aid)
-
-        if 'train' in self.split:
-            self.dataset = torch.load(self.path_trainset)
-        elif self.split == 'val':
-            if self.proc_split == 'train':
-                self.dataset = torch.load(self.path_valset)
-            elif self.proc_split == 'trainval':
-                self.dataset = torch.load(self.path_trainset)
-        elif self.split == 'test':
-            self.dataset = torch.load(self.path_testset)
-            if self.has_testdevset:
-                self.is_qid_testdev = torch.load(self.path_is_qid_testdev)
-
-        self.collate_fn = bootstrap_tf.Compose([
-            bootstrap_tf.ListDictsToDictLists(),
-            bootstrap_tf.PadTensors(use_keys=[
-                'question', 'pooled_feat', 'cls_scores', 'rois', 'cls', 'cls_oh', 'norm_rois'
-            ]),
-            #bootstrap_tf.SortByKey(key='lengths'), # no need for the current implementation
-            bootstrap_tf.StackTensors()
-        ])
-
-        if self.proc_split == 'trainval' and self.split in ['train','val']:
-            self.bootstrapping()
+        raise NotImplementedError
 
     def add_word_tokens(self, word_to_wid):
         pass
@@ -119,7 +50,7 @@ class AbstractVQA(Dataset):
         pass
 
     def __len__(self):
-        return len(self.dataset['questions'])
+        raise NotImplementedError
 
     def get_image_name(self, image_id='1', format='COCO_%s_%012d.jpg'):
         pass
@@ -196,45 +127,7 @@ class ListVQADatasets(ListDatasets):
              pin_memory=False,
              nb_threads=4,
              seed=1337):
-        super(ListVQADatasets, self).__init__(
-            datasets=datasets,
-            split=split,
-            batch_size=batch_size,
-            nb_threads=nb_threads,
-            pin_memory=pin_memory,
-            shuffle=shuffle,
-            bootstrapping=False,
-            seed=seed)
-
-        self.subdir_processed = self.make_subdir_processed()
-        Logger()('Subdir proccessed: {}'.format(self.subdir_processed))
-        self.path_wid_to_word = osp.join(self.subdir_processed, 'wid_to_word.pth')
-        self.path_word_to_wid = osp.join(self.subdir_processed, 'word_to_wid.pth')
-        self.path_aid_to_ans = osp.join(self.subdir_processed, 'aid_to_ans.pth')
-        self.path_ans_to_aid = osp.join(self.subdir_processed, 'ans_to_aid.pth')
-
-        self.process()
-        
-        # if not os.path.isdir(self.subdir_processed):
-        #     self.process()
-        # else:
-        #     Logger()('Loading list_datasets_vqa proccessed state')
-        #     self.wid_to_word = torch.load(self.path_wid_to_word)
-        #     self.word_to_wid = torch.load(self.path_word_to_wid)
-        #     self.aid_to_ans = torch.load(self.path_aid_to_ans)
-        #     self.ans_to_aid = torch.load(self.path_ans_to_aid)
-
-        #     for i in range(len(self.datasets)):
-        #         subdir_processed = os.path.join(self.subdir_processed, '{}.{}'.format(
-        #             self.datasets[i].__class__.__name__,
-        #             self.datasets[i].split))
-        #         path_dataset = os.path.join(subdir_processed, 'dataset.pth')
-        #         self.datasets[i].dataset = torch.load(path_dataset)
-        #     Logger()('Done !')
-
-        Logger()('Final number of tokens {}'.format(len(self.word_to_wid)))
-
-        self.make_lengths_and_ids()
+        raise NotImplementedError
         
 
     def make_subdir_processed(self):

@@ -11,13 +11,7 @@ from . import vrd_utils
 class VRDRelationshipPhrase(nn.Module):
 
     def __init__(self, engine=None, split='test'):
-        super(VRDRelationshipPhrase, self).__init__()
-        self.split = split
-        self.activation = torch.sigmoid
-        self.reset()
-        self.dataset = engine.dataset['eval']
-        if engine:
-            engine.register_hook(f'{split}_on_end_epoch', self.calculate_metrics)
+        raise NotImplementedError
 
     def reset(self):
         # Relationship task metrics

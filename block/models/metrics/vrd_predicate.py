@@ -12,12 +12,7 @@ from . import vrd_utils
 class VRDPredicate(nn.Module):
 
     def __init__(self, engine=None, split='test', nb_classes=71):
-        super(VRDPredicate, self).__init__()
-        self.split = split
-        self.k = nb_classes
-        self.reset()
-        if engine:
-            engine.register_hook('%s_on_end_epoch'%split, self.calculate_metrics)
+        raise NotImplementedError
 
     def reset(self):
         pass

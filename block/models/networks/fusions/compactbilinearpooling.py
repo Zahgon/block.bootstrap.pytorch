@@ -49,28 +49,7 @@ class CountSketch(nn.Module):
     """
 
     def __init__(self, input_size, output_size, h = None, s = None):
-        super(CountSketch, self).__init__()
-
-        self.input_size = input_size
-        self.output_size = output_size
-
-        if h is None:
-            h = torch.LongTensor(input_size).random_(0, output_size)
-        if s is None:
-            s = 2 * torch.Tensor(input_size).random_(0,2) - 1
-
-        # The Variable h being a list of indices,
-        # If the type of this module is changed (e.g. float to double),
-        # the variable h should remain a LongTensor
-        # therefore we force float() and double() to be no-ops on the variable h.
-        def identity(self):
-            pass
-
-        h.float = types.MethodType(identity,h)
-        h.double = types.MethodType(identity,h)
-
-        self.register_buffer('h',h)
-        self.register_buffer('s',s)
+        raise NotImplementedError
 
     def forward(self, x):
         pass
@@ -132,11 +111,7 @@ class CompactBilinearPooling(nn.Module):
         Akira Fukui et al. "Multimodal Compact Bilinear Pooling for Visual Question Answering and Visual Grounding", arXiv:1606.01847 (2016).
     """
     def __init__(self, input1_size, input2_size, output_size, h1 = None, s1 = None, h2 = None, s2 = None, force_cpu_scatter_add=False):
-        super(CompactBilinearPooling, self).__init__()
-        self.add_module('sketch1', CountSketch(input1_size, output_size, h1, s1))
-        self.add_module('sketch2', CountSketch(input2_size, output_size, h2, s2))
-        self.output_size = output_size
-        self.force_cpu_scatter_add = force_cpu_scatter_add
+        raise NotImplementedError
 
     def forward(self, x, y = None):
         pass

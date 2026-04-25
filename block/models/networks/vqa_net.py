@@ -26,20 +26,7 @@ class VQANet(nn.Module):
             word_to_wid={},
             aid_to_ans=[],
             ans_to_aid={}):
-        super(VQANet, self).__init__()
-        self.self_q_att = self_q_att
-        self.wid_to_word = wid_to_word
-        self.word_to_wid = word_to_wid
-        self.aid_to_ans = aid_to_ans
-        self.ans_to_aid = ans_to_aid
-        # Modules
-        self.txt_enc = factory_text_enc(self.wid_to_word, txt_enc)
-        if self.self_q_att:
-            self.q_att_linear0 = nn.Linear(2400, 512)
-            self.q_att_linear1 = nn.Linear(512, 2)
-
-        self.attention = Attention(**attention)
-        self.fusion = factory_fusion(classif['fusion'])
+        raise NotImplementedError
 
     def forward(self, batch):
         pass
@@ -54,12 +41,7 @@ class VQANet(nn.Module):
 class Attention(nn.Module):
 
     def __init__(self, mlp_glimpses=0, fusion={}):
-        super(Attention, self).__init__()
-        self.mlp_glimpses = mlp_glimpses
-        self.fusion = factory_fusion(fusion)
-        if self.mlp_glimpses > 0:
-            self.linear0 = nn.Linear(fusion['output_dim'], 512)
-            self.linear1 = nn.Linear(512, mlp_glimpses)
+        raise NotImplementedError
 
     def forward(self, q, v):
         pass

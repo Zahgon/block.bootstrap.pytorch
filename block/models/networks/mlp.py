@@ -10,15 +10,7 @@ class MLP(nn.Module):
             dimensions,
             activation='relu',
             dropout=0.):
-        super(MLP, self).__init__()
-        self.input_dim = input_dim
-        self.dimensions = dimensions
-        self.activation = activation
-        self.dropout = dropout
-        # Modules
-        self.linears = nn.ModuleList([nn.Linear(input_dim, dimensions[0])])
-        for din, dout in zip(dimensions[:-1], dimensions[1:]):
-            self.linears.append(nn.Linear(din, dout))
+        raise NotImplementedError
     
     def forward(self, x):
         pass

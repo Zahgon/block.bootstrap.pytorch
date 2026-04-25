@@ -29,43 +29,13 @@ class VQA2VG(Dataset):
             samplingans=False,
             dir_rcnn='data/coco/extract_rcnn',
             dir_rcnn_vg='data/vg/extract_rcnn'):
-        super(VQA2VG, self).__init__(
-            dir_data=dir_data,
-            split=split,
-            batch_size=batch_size,
-            nb_threads=nb_threads,
-            pin_memory=pin_memory,
-            shuffle=shuffle)
-        self.vqa2 = VQA2(
-            dir_data=dir_data,
-            split=split,
-            nans=nans,
-            minwcount=minwcount,
-            nlp=nlp,
-            proc_split=proc_split,
-            samplingans=samplingans,
-            dir_rcnn=dir_rcnn)
-        self.vg = VG(
-            dir_data=dir_data_vg,
-            split='train',
-            nans=10000,
-            minwcount=0,
-            nlp=nlp,
-            dir_rcnn=dir_rcnn_vg)
-        self.collate_fn = self.vqa2.collate_fn
+        raise NotImplementedError
 
     def __getattr__(self, key):
-        try:
-            return super(VQA2VG, self).__getattr__(key)
-        except AttributeError:
-            return self.vqa2.__getattribute__(key)
+        raise NotImplementedError
 
     def __getitem__(self, index):
-        if index < len(self.vqa2):
-            item = self.vqa2[index]
-        else:
-            item = self.vg[index-len(self.vqa2)]
-        return item
+        raise NotImplementedError
 
     def __len__(self):
-        return len(self.vqa2) + len(self.vg)
+        raise NotImplementedError
